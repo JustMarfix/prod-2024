@@ -1,16 +1,16 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    id(Plugins.androidApplication)
+    id(Plugins.kotlinAndroid)
 }
 
 android {
     namespace = "com.smmanager"
-    compileSdk = 34
+    compileSdk = Config.compileSdk
 
     defaultConfig {
-        applicationId = "com.smmanager"
-        minSdk = 26
-        targetSdk = 34
+        applicationId = Config.applicationId
+        minSdk = Config.minSdk
+        targetSdk = Config.targetSdk
         versionCode = 1
         versionName = "1.0"
 
@@ -19,6 +19,14 @@ android {
 
     buildTypes {
         release {
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+
+        debug {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -33,15 +41,23 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    implementation(Dependencies.Lifecycle.core)
+
+    implementation(Dependencies.UI.appCompat)
+    implementation(Dependencies.UI.material)
+    implementation(Dependencies.UI.constraintLayout)
+
+    implementation(Dependencies.WebKit.webkit)
+
+    testImplementation(Dependencies.Testing.junit)
+    testImplementation(Dependencies.Testing.androidJunit)
+    testImplementation(Dependencies.Testing.espresso)
 }
