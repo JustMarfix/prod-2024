@@ -24,6 +24,16 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField(
+                "String",
+                "SMMYa_URL",
+                "\"http://84.201.175.97/\""
+            )
+            buildConfigField(
+                "String",
+                "SMMYa_URL_HOST",
+                "\"84.201.175.97\""
+            )
         }
 
         debug {
@@ -31,6 +41,16 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
+            )
+            buildConfigField(
+                "String",
+                "SMMYa_URL",
+                "\"http://84.201.175.97/\""
+            )
+            buildConfigField(
+                "String",
+                "SMMYa_URL_HOST",
+                "\"84.201.175.97\""
             )
         }
     }
@@ -44,6 +64,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
@@ -54,6 +75,7 @@ dependencies {
     implementation(Dependencies.UI.appCompat)
     implementation(Dependencies.UI.material)
     implementation(Dependencies.UI.constraintLayout)
+    implementation(Dependencies.UI.splashScreen)
 
     implementation(Dependencies.WebKit.webkit)
 
