@@ -5,14 +5,37 @@ import android.content.Intent
 import android.webkit.CookieManager
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.content.ContextCompat
 import com.smmanager.BuildConfig
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class SMMYaWebViewClient(
-    private val onErrorAction: (Int) -> Unit = {}
+    private val onRefreshingUpdate: (Boolean) -> Unit,
 ) : WebViewClient() {
+
+    private val _webViewState = MutableStateFlow<WebViewState>(WebViewState.Content)
+    val webViewState = _webViewState.asStateFlow()
+    private var isRefreshing = false
+
+    fun setRefreshingToTrue() {
+        isRefreshing = true
+    }
+
+    override fun onPageFinished(view: WebView?, url: String?) {
+        super.onPageFinished(view, url)
+        if (isRefreshing) {
+            isRefreshing = false
+            _webViewState.update {
+                WebViewState.Content
+            }
+        }
+        onRefreshingUpdate(isRefreshing)
+    }
 
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
         if (request != null && request.url.host == BuildConfig.SMMYa_URL_HOST) {
@@ -34,8 +57,24 @@ class SMMYaWebViewClient(
         request: WebResourceRequest?,
         error: WebResourceError?
     ) {
+        isRefreshing = false
         if (error != null) {
-            onErrorAction(error.errorCode)
+            _webViewState.update {
+                WebViewState.SomeError(error.errorCode)
+            }
+        }
+    }
+
+    override fun onReceivedHttpError(
+        view: WebView?,
+        request: WebResourceRequest?,
+        errorResponse: WebResourceResponse?
+    ) {
+        isRefreshing = false
+        if (errorResponse != null && errorResponse.statusCode in 500..599) {
+            _webViewState.update {
+                WebViewState.HttpError(errorResponse.statusCode)
+            }
         }
     }
 }

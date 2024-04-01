@@ -1,45 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
     tools:context=".MainActivity">
 
-    <WebView
-        android:id="@+id/webView"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center" />
+        android:layout_height="match_parent">
+
+        <WebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
 
 
-    <LinearLayout
-        android:id="@+id/error_component"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone"
-        tools:ignore="UseCompoundDrawables">
+        <LinearLayout
+            android:id="@+id/error_component"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:ignore="UseCompoundDrawables">
 
-        <ImageView
-            android:layout_width="96dp"
-            android:layout_height="96dp"
-            android:layout_gravity="center"
-            android:contentDescription="@string/wifi_off"
-            android:src="@drawable/wifi_off" />
+            <ImageView
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/wifi_off"
+                android:src="@drawable/wifi_off" />
 
-        <TextView
-            android:id="@+id/error_text"
-            style="@style/TextAppearance.Material3.HeadlineMedium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="12dp"
-            android:text="@string/wifi_off"
-            android:textAlignment="center" />
+            <TextView
+                android:id="@+id/error_text"
+                style="@style/TextAppearance.Material3.HeadlineMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="12dp"
+                android:text="@string/wifi_off"
+                android:textAlignment="center" />
 
-    </LinearLayout>
+        </LinearLayout>
 
-</FrameLayout>
+    </FrameLayout>
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

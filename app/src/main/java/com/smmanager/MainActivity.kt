@@ -6,22 +6,30 @@ import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.webkit.WebViewClient
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.smmanager.databinding.ActivityMainBinding
 import com.smmanager.web_view.SMMYaWebViewClient
+import com.smmanager.web_view.WebViewState
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @SuppressLint("SetJavaScriptEnabled")
 class MainActivity : AppCompatActivity() {
 
     private var _binding: ActivityMainBinding? = null
     private val binding: ActivityMainBinding get() = _binding!!
+
+    private val webViewClient = SMMYaWebViewClient(
+        this::handleSwipeRefreshing
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         handleOrientationChanges()
@@ -35,6 +43,43 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setupWebView()
         setupBackPressOverriding()
+        setupSwipeRefreshing()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                webViewClient.webViewState.collectLatest { state ->
+                    handleWebViewState(state)
+                }
+            }
+        }
+    }
+
+    private fun handleWebViewState(state: WebViewState) {
+        handleSwipeRefreshing(false)
+        when (state) {
+            is WebViewState.Content -> {
+                binding.webView.visibility = View.VISIBLE
+                binding.errorComponent.visibility = View.GONE
+            }
+
+            is WebViewState.SomeError -> {
+                binding.webView.visibility = View.GONE
+                binding.errorComponent.visibility = View.VISIBLE
+                binding.errorText.text = resources.getText(R.string.some_error)
+            }
+
+            is WebViewState.HttpError -> {
+                binding.webView.visibility = View.GONE
+                binding.errorComponent.visibility = View.VISIBLE
+                binding.errorText.text = resources.getText(R.string.some_error)
+            }
+        }
+    }
+
+    private fun setupSwipeRefreshing() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            webViewClient.setRefreshingToTrue()
+            binding.webView.reload()
+        }
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -79,9 +124,7 @@ class MainActivity : AppCompatActivity() {
             useWideViewPort = true
         }
 
-        binding.webView.webViewClient = SMMYaWebViewClient(
-            onErrorAction = this::handleWebViewErrors
-        )
+        binding.webView.webViewClient = webViewClient
         binding.webView.loadUrl(BuildConfig.SMMYa_URL)
     }
 
@@ -95,19 +138,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleWebViewErrors(errorCode: Int) {
-        when (errorCode) {
-            WebViewClient.ERROR_HOST_LOOKUP -> {
-                binding.errorText.text = resources.getText(R.string.some_error)
-                binding.errorComponent.visibility = View.VISIBLE
-                binding.webView.visibility = View.GONE
-            }
-
-            else -> {
-                binding.errorText.text = resources.getText(R.string.some_error)
-                binding.errorComponent.visibility = View.VISIBLE
-                binding.webView.visibility = View.GONE
-            }
-        }
+    private fun handleSwipeRefreshing(isEnabled: Boolean) {
+        binding.swipeRefreshLayout.isRefreshing = isEnabled
     }
 }

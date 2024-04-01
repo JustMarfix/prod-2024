@@ -71,11 +71,13 @@ android {
 dependencies {
 
     implementation(Dependencies.Lifecycle.core)
+    implementation(Dependencies.Lifecycle.lifecycle)
 
     implementation(Dependencies.UI.appCompat)
     implementation(Dependencies.UI.material)
     implementation(Dependencies.UI.constraintLayout)
     implementation(Dependencies.UI.splashScreen)
+    implementation(Dependencies.UI.swipeRefreshLayout)
 
     implementation(Dependencies.WebKit.webkit)
 
