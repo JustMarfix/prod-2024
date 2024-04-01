@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleWebViewState(state: WebViewState) {
         handleSwipeRefreshing(false)
+        binding.progressIndicator.visibility = if (state.isLoading) View.VISIBLE else View.GONE
         when (state) {
             is WebViewState.Content -> {
                 binding.webView.visibility = View.VISIBLE

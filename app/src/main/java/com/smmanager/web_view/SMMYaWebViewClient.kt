@@ -2,6 +2,8 @@ package com.smmanager.web_view
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
+import android.util.Log
 import android.webkit.CookieManager
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
@@ -18,7 +20,7 @@ class SMMYaWebViewClient(
     private val onRefreshingUpdate: (Boolean) -> Unit,
 ) : WebViewClient() {
 
-    private val _webViewState = MutableStateFlow<WebViewState>(WebViewState.Content)
+    private val _webViewState = MutableStateFlow<WebViewState>(WebViewState.Content(true))
     val webViewState = _webViewState.asStateFlow()
     private var isRefreshing = false
 
@@ -26,12 +28,27 @@ class SMMYaWebViewClient(
         isRefreshing = true
     }
 
+    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+        super.onPageStarted(view, url, favicon)
+        _webViewState.update { state ->
+            when (state) {
+                is WebViewState.Content -> state.copy(isLoading = true)
+
+                is WebViewState.SomeError -> state.copy(isLoading = true)
+
+                is WebViewState.HttpError -> state.copy(isLoading = true)
+            }
+        }
+    }
+
     override fun onPageFinished(view: WebView?, url: String?) {
         super.onPageFinished(view, url)
         if (isRefreshing) {
             isRefreshing = false
             _webViewState.update {
-                WebViewState.Content
+                WebViewState.Content(
+                    isLoading = false
+                )
             }
         }
         onRefreshingUpdate(isRefreshing)
@@ -60,7 +77,7 @@ class SMMYaWebViewClient(
         isRefreshing = false
         if (error != null) {
             _webViewState.update {
-                WebViewState.SomeError(error.errorCode)
+                WebViewState.SomeError(error.errorCode, false)
             }
         }
     }
@@ -73,7 +90,7 @@ class SMMYaWebViewClient(
         isRefreshing = false
         if (errorResponse != null && errorResponse.statusCode in 500..599) {
             _webViewState.update {
-                WebViewState.HttpError(errorResponse.statusCode)
+                WebViewState.HttpError(errorResponse.statusCode, false)
             }
         }
     }
