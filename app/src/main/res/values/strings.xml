@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SMMYa</string>
+    <string name="some_error">Some error occurred, try again later</string>
+    <string name="wifi_off">Wifi off</string>
 </resources>
