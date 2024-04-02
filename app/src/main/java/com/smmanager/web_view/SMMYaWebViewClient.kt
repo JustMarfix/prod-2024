@@ -3,7 +3,6 @@ package com.smmanager.web_view
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
-import android.util.Log
 import android.webkit.CookieManager
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
@@ -80,6 +79,7 @@ class SMMYaWebViewClient(
                 WebViewState.SomeError(error.errorCode, false)
             }
         }
+        super.onReceivedError(view, request, error)
     }
 
     override fun onReceivedHttpError(
@@ -93,5 +93,6 @@ class SMMYaWebViewClient(
                 WebViewState.HttpError(errorResponse.statusCode, false)
             }
         }
+        super.onReceivedHttpError(view, request, errorResponse)
     }
 }

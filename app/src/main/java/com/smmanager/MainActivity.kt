@@ -55,7 +55,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleWebViewState(state: WebViewState) {
         handleSwipeRefreshing(false)
-        binding.progressIndicator.visibility = if (state.isLoading) View.VISIBLE else View.GONE
         when (state) {
             is WebViewState.Content -> {
                 binding.webView.visibility = View.VISIBLE
@@ -75,6 +74,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun setupSwipeRefreshing() {
         binding.swipeRefreshLayout.setOnRefreshListener {
@@ -125,6 +125,9 @@ class MainActivity : AppCompatActivity() {
             useWideViewPort = true
         }
 
+        binding.webView.setOnScrollChangeListener { _, _, scrollY, _, _ ->
+            binding.swipeRefreshLayout.isEnabled = scrollY == 0
+        }
         binding.webView.webViewClient = webViewClient
         binding.webView.loadUrl(BuildConfig.SMMYa_URL)
     }
